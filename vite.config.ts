@@ -18,6 +18,7 @@ export default defineConfig({
         theme_color: '#1a1a1a',
         background_color: '#ffffff',
         display: 'standalone',
+        prefer_related_applications: false,
         icons: [
           {
             src: 'pwa-192x192.png',
