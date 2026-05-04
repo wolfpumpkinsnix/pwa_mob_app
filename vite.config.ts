@@ -12,7 +12,7 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        id: "/?source=pwa",
+        id: "/pwa_mob_app/?source=pwa",
         name: "My PWA Web Components",
         short_name: "PWA WebComp",
         description:
@@ -28,13 +28,25 @@ export default defineConfig({
             src: "pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
-            purpose: "any maskable monochrome",
+            purpose: "any",
           },
           {
             src: "pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any maskable monochrome",
+            purpose: "any",
+          },
+          {
+            src: "pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "maskable monochrome",
+          },
+          {
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable monochrome",
           },
         ],
       },

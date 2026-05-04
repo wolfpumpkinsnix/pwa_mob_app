@@ -24,11 +24,15 @@ export class AppComponent extends HTMLElement {
       this.deferredPrompt = e;
       // Update UI to show the install button
       this.canInstall.value = true;
+      const btn = this.shadowRoot?.getElementById('install-btn');
+      if (btn) btn.style.display = 'inline-block';
     });
 
     window.addEventListener('appinstalled', () => {
       this.deferredPrompt = null;
       this.canInstall.value = false;
+      const btn = this.shadowRoot?.getElementById('install-btn');
+      if (btn) btn.style.display = 'none';
       console.log('PWA was installed');
     });
   }
@@ -46,6 +50,8 @@ export class AppComponent extends HTMLElement {
     // We've used the prompt, and can't use it again, throw it away
     this.deferredPrompt = null;
     this.canInstall.value = false;
+    const btn = this.shadowRoot?.getElementById('install-btn');
+    if (btn) btn.style.display = 'none';
   };
 
   // The event listener from (click)="increment" in the template will call this
