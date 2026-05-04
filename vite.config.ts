@@ -12,7 +12,7 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        id: "/pwa_mob_app/",
+        id: "pwa-webcomp",
         name: "My PWA Web Components",
         short_name: "PWA WebComp",
         description:
