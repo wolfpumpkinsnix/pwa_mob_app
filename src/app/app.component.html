@@ -12,4 +12,10 @@
   <button id="counter" type="button" class="counter" (click)="increment">
     Count is {{ count }}
   </button>
+
+  <br><br>
+
+  <button type="button" class="counter" [hidden]="!canInstall" (click)="installPwa">
+    📱 Install App
+  </button>
 </section>

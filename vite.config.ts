@@ -12,7 +12,7 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        id: "pwa-webcomp",
+        id: "/?source=pwa",
         name: "My PWA Web Components",
         short_name: "PWA WebComp",
         description:
@@ -37,6 +37,9 @@ export default defineConfig({
             purpose: "any maskable monochrome",
           },
         ],
+      },
+      devOptions: {
+        enabled: true,
       },
     }),
   ],
