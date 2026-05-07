@@ -15,6 +15,7 @@ export default defineConfig({
         "favicon.svg",
         "pwa-192x192.png",
         "pwa-512x512.png",
+        "pwa-96x96.png",
         "screenshot-wide.png",
         "screenshot-mobile.png",
       ],
@@ -33,6 +34,12 @@ export default defineConfig({
         prefer_related_applications: false,
         icons: [
           {
+            src: "pwa-96x96.png",
+            sizes: "96x96",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
             src: "pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
@@ -43,6 +50,12 @@ export default defineConfig({
             sizes: "512x512",
             type: "image/png",
             purpose: "any",
+          },
+          {
+            src: "pwa-96x96.png",
+            sizes: "96x96",
+            type: "image/png",
+            purpose: "maskable",
           },
           {
             src: "pwa-192x192.png",
