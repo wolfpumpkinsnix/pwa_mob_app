@@ -1,0 +1,47 @@
+.title-bar-container {
+  position: fixed;
+  left: env(titlebar-area-x, 0);
+  top: env(titlebar-area-y, 0);
+  width: env(titlebar-area-width, 100%);
+  height: env(titlebar-area-height, 40px);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  box-sizing: border-box;
+  -webkit-app-region: drag;
+  z-index: 1000;
+}
+
+.title {
+  font-weight: 500;
+  color: var(--text-h);
+  margin-right: 24px;
+  white-space: nowrap;
+}
+
+.search-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  -webkit-app-region: no-drag;
+}
+
+input {
+  width: 100%;
+  max-width: 400px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* Hide when WCO is not active and we're just in a normal browser tab */
+@media (display-mode: browser) {
+  .title-bar-container {
+    display: none;
+  }
+}

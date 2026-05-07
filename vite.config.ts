@@ -24,6 +24,7 @@ export default defineConfig({
         short_name: "PWA WebComp",
         description:
           "A dependency-light Progressive Web App built with Web Components",
+        display_override: ["window-controls-overlay"],
         theme_color: "#1a1a1a",
         background_color: "#ffffff",
         display: "standalone",

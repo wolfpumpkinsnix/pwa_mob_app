@@ -164,6 +164,7 @@ code {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  padding-top: env(titlebar-area-inset-top, 0px);
 }
 
 #center {
