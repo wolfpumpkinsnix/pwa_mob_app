@@ -1,0 +1,24 @@
+<div class="todo-container">
+  <h3>My Tasks</h3>
+  
+  @if (tasks.value.length === 0) {
+    <p class="empty-msg">No tasks found! Enjoy your free time.</p>
+  } @else {
+    <p class="status-msg">You have {{ tasks.value.length }} tasks pending.</p>
+  }
+
+  <div class="input-group">
+    <input type="text" placeholder="Add a task..." id="taskInput">
+    <button (click)="addTask">Add</button>
+  </div>
+  <ul>
+    @for (task of tasks) {
+      <li class="task-item">
+        <span class="{{ task.done ? 'done' : '' }}">{{ task.text }}</span>
+        <button (click)="toggleTask" data-id="{{ task.id }}">
+          {{ task.done ? 'Undo' : 'Done' }}
+        </button>
+      </li>
+    }
+  </ul>
+</div>

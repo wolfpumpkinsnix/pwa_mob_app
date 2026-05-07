@@ -8,9 +8,13 @@ The core tenet of this project is to maintain an extremely lightweight and high-
 
 - **Zero Framework Overhead:** The application relies natively on Web Components and Shadow DOM, bypassing the need for a heavy Virtual DOM or large framework runtimes.
 - **Granular Reactivity:** Powered by `@preact/signals-core`, state updates only target the exact DOM text nodes or attributes that have changed. There is no costly "re-render" lifecycle.
-- **Minimal Tooling:** The library relies entirely on standard browser APIs (like `TreeWalker` for fast text interpolation and native event listeners) and uses Vite for optimized bundling and transpilation.
+- **Minimal Tooling:** The library uses a custom **Vite Plugin** to pre-compile templates during the build. This transforms keywords like `@for` and `@if` into browser-optimized tags before they reach the client, ensuring rapid component initialization.
 - **Scoped Footprint:** CSS and HTML templates are scoped to the individual components, reducing style recalculations across the global document and ensuring rapid component initialization.
 
 ## Architecture & Guidelines
 
-- **Component Structure:** When adding a new component, always place its `.ts`, `.html`, and `.css` files inside a dedicated folder named after the component under the `src/components/` directory (e.g., `src/components/my-component/my-component.ts`).
+- **Component Structure:** When adding a new component, always place its `.ts`, `.html`, and `.css` files inside a dedicated folder named after the component under the `src/components/` directory. Templates and styles **must** be kept in separate `.html` and `.css` files and imported into the `.ts` file using Vite's `?raw` suffix (e.g., `import template from './my.component.html?raw'`).
+
+## Quality Assurance
+
+- **Always Lint & Build:** Before finalizing any changes, always run `yarn lint` and `yarn build` to ensure the codebase remains clean and compiles correctly. All "tests" (linting and building) must pass.
