@@ -1,5 +1,5 @@
 import { Component } from '../lib/component';
-import { signal } from '@preact/signals-core';
+import { signal, effect } from '@preact/signals-core';
 import template from './app.component.html?raw';
 import styles from './app.component.css?raw';
 
@@ -17,23 +17,25 @@ export class AppComponent extends HTMLElement {
   constructor() {
     super();
     
+    // Listen for the install prompt
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
-      // Stash the event so it can be triggered later.
       this.deferredPrompt = e;
-      // Update UI to show the install button
       this.canInstall.value = true;
-      const btn = this.shadowRoot?.getElementById('install-btn');
-      if (btn) btn.style.display = 'inline-block';
     });
 
     window.addEventListener('appinstalled', () => {
       this.deferredPrompt = null;
       this.canInstall.value = false;
-      const btn = this.shadowRoot?.getElementById('install-btn');
-      if (btn) btn.style.display = 'none';
       console.log('PWA was installed');
+    });
+
+    // Use a reactive effect to show/hide the button
+    effect(() => {
+      const btn = this.shadowRoot?.getElementById('install-btn');
+      if (btn) {
+        btn.style.display = this.canInstall.value ? 'inline-block' : 'none';
+      }
     });
   }
 
