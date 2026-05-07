@@ -13,6 +13,13 @@ export class AppComponent extends HTMLElement {
   count = signal(0);
   canInstall = signal(false);
   deferredPrompt: any = null;
+  diagnostics = signal({
+    isHttps: window.location.protocol === 'https:',
+    isLocalhost: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+    swActive: false,
+    manifestFound: !!document.querySelector('link[rel="manifest"]'),
+    installPromptFired: false
+  });
 
   constructor() {
     super();
@@ -22,13 +29,20 @@ export class AppComponent extends HTMLElement {
       e.preventDefault();
       this.deferredPrompt = e;
       this.canInstall.value = true;
+      this.diagnostics.value = { ...this.diagnostics.value, installPromptFired: true };
     });
 
     window.addEventListener("appinstalled", () => {
       this.deferredPrompt = null;
       this.canInstall.value = false;
-      console.log("PWA was installed");
     });
+
+    // Check service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(reg => {
+        this.diagnostics.value = { ...this.diagnostics.value, swActive: !!reg.active };
+      });
+    }
   }
 
   connectedCallback() {

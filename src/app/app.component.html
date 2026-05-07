@@ -21,4 +21,28 @@
   </button>
 
   <todo-list></todo-list>
+
+  <!-- PWA Diagnostic Tool -->
+  <div class="diagnostic-card">
+    <h3>PWA Status</h3>
+    <div class="stat {{ diagnostics.value.isHttps || diagnostics.value.isLocalhost ? 'pass' : 'fail' }}">
+      🔒 Secure Origin: {{ diagnostics.value.isHttps || diagnostics.value.isLocalhost ? 'YES' : 'NO (HTTPS required)' }}
+    </div>
+    <div class="stat {{ diagnostics.value.swActive ? 'pass' : 'fail' }}">
+      ⚙️ Service Worker: {{ diagnostics.value.swActive ? 'ACTIVE' : 'NOT FOUND' }}
+    </div>
+    <div class="stat {{ diagnostics.value.manifestFound ? 'pass' : 'fail' }}">
+      📄 Manifest: {{ diagnostics.value.manifestFound ? 'FOUND' : 'MISSING' }}
+    </div>
+    <div class="stat {{ diagnostics.value.installPromptFired ? 'pass' : 'fail' }}">
+      📱 Install Prompt: {{ diagnostics.value.installPromptFired ? 'READY' : 'WAITING...' }}
+    </div>
+    
+    @if (!diagnostics.value.isHttps && !diagnostics.value.isLocalhost) {
+      <div class="warning">
+        ⚠️ <strong>CRITICAL:</strong> You are using HTTP on a remote IP. 
+        Chrome for Android <strong>requires HTTPS</strong> to allow installation.
+      </div>
+    }
+  </div>
 </section>

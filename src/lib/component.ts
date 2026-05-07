@@ -13,7 +13,7 @@ export function Component(options: ComponentOptions) {
   ) {
     class WebComponent extends target {
       private _cleanupEffects: (() => void)[] = [];
-      private _exprCache = new Map<string, Function>();
+      private _exprCache = new Map<string, (...args: any[]) => any>();
 
       constructor(...args: any[]) {
         super(...args);
@@ -68,7 +68,7 @@ export function Component(options: ComponentOptions) {
           const keys = Object.keys(context);
           const cacheKey = `${keys.join(',')}|${expr}`;
           if (!this._exprCache.has(cacheKey)) {
-            this._exprCache.set(cacheKey, new Function(...keys, `return ${expr}`));
+            this._exprCache.set(cacheKey, new Function(...keys, `return ${expr}`) as (...args: any[]) => any);
           }
           const result = this._exprCache.get(cacheKey)!(...Object.values(context));
           
@@ -77,7 +77,7 @@ export function Component(options: ComponentOptions) {
             return result.value;
           }
           return result;
-        } catch (e) {
+        } catch {
           return '';
         }
       }

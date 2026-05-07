@@ -17,4 +17,4 @@ The core tenet of this project is to maintain an extremely lightweight and high-
 
 ## Quality Assurance
 
-- **Always Lint & Build:** Before finalizing any changes, always run `yarn lint` and `yarn build` to ensure the codebase remains clean and compiles correctly. All "tests" (linting and building) must pass.
+- **Always Lint & Build:** Before finalizing any changes, always run `yarn verify` to ensure the codebase remains clean and compiles correctly. All "tests" (linting and building) must pass.
