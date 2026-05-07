@@ -46,6 +46,14 @@ export class AppComponent extends HTMLElement {
   }
 
   connectedCallback() {
+    // Refresh manifest check
+    setTimeout(() => {
+      this.diagnostics.value = { 
+        ...this.diagnostics.value, 
+        manifestFound: !!document.querySelector('link[rel="manifest"]') 
+      };
+    }, 100);
+
     // Use a reactive effect to show/hide the button
     // We subscribe to the signal at the start of the effect to ensure it re-runs
     effect(() => {
