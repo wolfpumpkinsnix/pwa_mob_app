@@ -11,7 +11,13 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "pwa-192x192.png", "pwa-512x512.png"],
+      includeAssets: [
+        "favicon.svg",
+        "pwa-192x192.png",
+        "pwa-512x512.png",
+        "screenshot-wide.png",
+        "screenshot-mobile.png",
+      ],
       manifest: {
         id: "pwa-web-comp",
         name: "My PWA Web Components",
@@ -48,6 +54,21 @@ export default defineConfig({
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",
+          },
+        ],
+        screenshots: [
+          {
+            src: "screenshot-wide.png",
+            sizes: "1280x800",
+            type: "image/png",
+            form_factor: "wide",
+            label: "Desktop View",
+          },
+          {
+            src: "screenshot-mobile.png",
+            sizes: "750x1334",
+            type: "image/png",
+            label: "Mobile View",
           },
         ],
       },
