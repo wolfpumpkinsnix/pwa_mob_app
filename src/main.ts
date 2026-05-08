@@ -2,6 +2,7 @@ import './style.css';
 import './components/theme-picker/theme-picker.component';
 import './components/title-bar/title-bar.component';
 import './components/todo-list/todo-list.component';
+import './components/pwa-diagnostics/pwa-diagnostics.component';
 import './app/app.component';
 
 import { registerSW } from 'virtual:pwa-register';

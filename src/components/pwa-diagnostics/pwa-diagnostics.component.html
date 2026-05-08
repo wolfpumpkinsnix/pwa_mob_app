@@ -1,0 +1,36 @@
+<button id="install-btn" type="button" class="install-btn" style="display: none;" (click)="installPwa">
+  Install App
+</button>
+
+<div class="diagnostic-card">
+  <h3>PWA Status</h3>
+  <div class="stat {{ diagnostics.value.isHttps || diagnostics.value.isLocalhost ? 'pass' : 'fail' }}">
+    Secure Origin: {{ diagnostics.value.isHttps || diagnostics.value.isLocalhost ? 'YES' : 'NO (HTTPS required)' }}
+  </div>
+  <div class="stat {{ diagnostics.value.swActive ? 'pass' : 'fail' }}">
+    Service Worker: {{ diagnostics.value.swActive ? 'ACTIVE' : 'NOT FOUND' }}
+  </div>
+  <div class="stat {{ diagnostics.value.manifestFound ? 'pass' : 'fail' }}">
+    Manifest: {{ diagnostics.value.manifestFound ? 'FOUND' : 'MISSING' }}
+  </div>
+  <div class="stat {{ diagnostics.value.manifestReachable ? 'pass' : 'fail' }}">
+    Manifest URL: {{ diagnostics.value.manifestReachable ? 'REACHABLE' : 'NOT REACHABLE' }}
+  </div>
+  <div class="stat {{ diagnostics.value.installPromptFired ? 'pass' : 'fail' }}">
+    Install Prompt: {{ diagnostics.value.installPromptFired ? 'READY' : 'WAITING...' }}
+  </div>
+  <div class="status-box">
+    <div class="status-label">Likely issue</div>
+    <div class="status-copy">{{ diagnostics.value.issue }}</div>
+  </div>
+  <div class="status-box">
+    <div class="status-label">Next step</div>
+    <div class="status-copy">{{ diagnostics.value.nextStep }}</div>
+  </div>
+  <div class="stat info">
+    Manifest Href: {{ diagnostics.value.manifestHref || 'not detected' }}
+  </div>
+  <div class="stat info">
+    URL: {{ diagnostics.value.url }}
+  </div>
+</div>

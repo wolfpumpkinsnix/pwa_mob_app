@@ -1,0 +1,70 @@
+:host {
+  display: block;
+  margin: 2rem 0;
+}
+
+.install-btn {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 600;
+  background: #1a1a1a;
+  color: #fff;
+  cursor: pointer;
+  transition: border-color 0.25s ease;
+}
+
+.install-btn:hover {
+  border-color: #646cff;
+}
+
+.diagnostic-card {
+  margin: 1.5rem auto 0;
+  padding: 1.5rem;
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  text-align: left;
+  backdrop-filter: blur(10px);
+}
+
+.diagnostic-card h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  color: var(--color-primary);
+}
+
+.stat {
+  padding: 8px 0;
+  font-family: monospace;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.stat.pass { color: #4ade80; }
+.stat.fail { color: #f87171; }
+.stat.info { color: #94a3b8; }
+
+.status-box {
+  margin-top: 0.9rem;
+  padding: 0.9rem 1rem;
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+}
+
+.status-label {
+  margin-bottom: 0.35rem;
+  color: #cbd5e1;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.status-copy {
+  color: #e2e8f0;
+  line-height: 1.5;
+}
