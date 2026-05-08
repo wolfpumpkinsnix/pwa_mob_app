@@ -24,7 +24,9 @@ export class PwaDiagnosticsComponent extends HTMLElement {
     swActive: false,
     manifestFound: false,
     manifestReachable: false,
+    manifestAttrHref: '',
     manifestHref: '',
+    baseUri: document.baseURI,
     installPromptFired: false,
     url: window.location.href,
     issue: 'Checking install requirements...',
@@ -93,7 +95,9 @@ export class PwaDiagnosticsComponent extends HTMLElement {
       swActive: boolean;
       manifestFound: boolean;
       manifestReachable: boolean;
+      manifestAttrHref: string;
       manifestHref: string;
+      baseUri: string;
       installPromptFired: boolean;
       url: string;
       issue: string;
@@ -104,6 +108,7 @@ export class PwaDiagnosticsComponent extends HTMLElement {
       ...this.diagnostics.value,
       ...updates,
       url: window.location.href,
+      baseUri: document.baseURI,
     };
 
     const secureOrigin = next.isHttps || next.isLocalhost;
@@ -143,11 +148,13 @@ export class PwaDiagnosticsComponent extends HTMLElement {
       document.querySelector('link[rel="manifest.json"]');
 
     const manifestHref = link instanceof HTMLLinkElement ? link.href : '';
+    const manifestAttrHref = link instanceof HTMLLinkElement ? link.getAttribute('href') ?? '' : '';
 
     if (!manifestHref) {
       this.updateDiagnostics({
         manifestFound: false,
         manifestReachable: false,
+        manifestAttrHref: '',
         manifestHref: '',
       });
       return false;
@@ -167,6 +174,7 @@ export class PwaDiagnosticsComponent extends HTMLElement {
     this.updateDiagnostics({
       manifestFound: true,
       manifestReachable,
+      manifestAttrHref,
       manifestHref,
     });
 

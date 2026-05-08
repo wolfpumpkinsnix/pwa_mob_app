@@ -28,7 +28,13 @@
     <div class="status-copy">{{ diagnostics.value.nextStep }}</div>
   </div>
   <div class="stat info">
+    Manifest Attr Href: {{ diagnostics.value.manifestAttrHref || 'not detected' }}
+  </div>
+  <div class="stat info">
     Manifest Href: {{ diagnostics.value.manifestHref || 'not detected' }}
+  </div>
+  <div class="stat info">
+    Base URI: {{ diagnostics.value.baseUri }}
   </div>
   <div class="stat info">
     URL: {{ diagnostics.value.url }}
