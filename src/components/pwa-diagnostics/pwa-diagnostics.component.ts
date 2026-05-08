@@ -27,6 +27,7 @@ export class PwaDiagnosticsComponent extends HTMLElement {
     manifestAttrHref: '',
     manifestHref: '',
     baseUri: document.baseURI,
+    headLinks: '',
     installPromptFired: false,
     url: window.location.href,
     issue: 'Checking install requirements...',
@@ -98,17 +99,27 @@ export class PwaDiagnosticsComponent extends HTMLElement {
       manifestAttrHref: string;
       manifestHref: string;
       baseUri: string;
+      headLinks: string;
       installPromptFired: boolean;
       url: string;
       issue: string;
       nextStep: string;
     }>
   ) {
+    const headLinks = Array.from(document.head.querySelectorAll('link'))
+      .map((node, index) => {
+        const rel = node.getAttribute('rel') ?? '(no rel)';
+        const href = node.getAttribute('href') ?? '(no href)';
+        return `${index + 1}. rel=${rel} href=${href}`;
+      })
+      .join(' | ');
+
     const next = {
       ...this.diagnostics.value,
       ...updates,
       url: window.location.href,
       baseUri: document.baseURI,
+      headLinks,
     };
 
     const secureOrigin = next.isHttps || next.isLocalhost;
