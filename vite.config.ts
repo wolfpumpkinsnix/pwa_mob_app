@@ -95,8 +95,10 @@ function webComponentTemplate() {
   };
 }
 
-export default defineConfig(() => {
-  const base = normalizeBasePath(process.env.BASE_PATH ?? "/");
+export default defineConfig(({ command }) => {
+  const base = command === "serve"
+    ? "/"
+    : normalizeBasePath(process.env.BASE_PATH ?? "/");
 
   return {
     base,
