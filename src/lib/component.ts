@@ -1,5 +1,8 @@
 import { effect } from '@preact/signals-core';
 
+type Cleanup = () => void;
+type CleanupBucket = Cleanup[];
+
 export interface ComponentOptions {
   selector: string;
   template?: string;
@@ -12,8 +15,11 @@ export function Component(options: ComponentOptions) {
     _context?: ClassDecoratorContext<T>
   ) {
     class WebComponent extends target {
-      private _cleanupEffects: (() => void)[] = [];
+      private _cleanupEffects: CleanupBucket = [];
+      private _contentRoot?: HTMLElement;
       private _exprCache = new Map<string, (...args: any[]) => any>();
+      private _loggedExpressionErrors = new Set<string>();
+      private _templateBound = false;
 
       constructor(...args: any[]) {
         super(...args);
@@ -31,16 +37,20 @@ export function Component(options: ComponentOptions) {
           unoStyle.textContent = `\n@unocss-placeholder\n`;
           shadow.appendChild(unoStyle);
           
-          if (options.template) {
-            const templateEl = document.createElement('template');
-            templateEl.innerHTML = options.template;
-            shadow.appendChild(templateEl.content.cloneNode(true));
-          }
+          const contentRoot = document.createElement('div');
+          contentRoot.style.display = 'contents';
+          shadow.appendChild(contentRoot);
+          this._contentRoot = contentRoot;
+          this._renderTemplate();
         }
       }
 
       connectedCallback() {
-        this._bindTemplate(this.shadowRoot as any);
+        if (!this._templateBound) {
+          this._renderTemplate();
+          this._bindTemplate(this._contentRoot ?? (this.shadowRoot as ShadowRoot));
+          this._templateBound = true;
+        }
         
         if (typeof target.prototype.connectedCallback === 'function') {
           target.prototype.connectedCallback.call(this);
@@ -48,11 +58,37 @@ export function Component(options: ComponentOptions) {
       }
 
       disconnectedCallback() {
-        this._cleanupEffects.forEach(cleanup => cleanup());
+        this._runCleanups(this._cleanupEffects);
         this._cleanupEffects = [];
+        this._templateBound = false;
         
         if (typeof target.prototype.disconnectedCallback === 'function') {
           target.prototype.disconnectedCallback.call(this);
+        }
+      }
+
+      private _renderTemplate() {
+        if (!this._contentRoot) return;
+
+        this._contentRoot.replaceChildren();
+
+        if (options.template) {
+          const templateEl = document.createElement('template');
+          templateEl.innerHTML = options.template;
+          this._contentRoot.appendChild(templateEl.content.cloneNode(true));
+        }
+      }
+
+      private _runCleanups(bucket: CleanupBucket) {
+        while (bucket.length) {
+          const cleanup = bucket.pop();
+          try {
+            cleanup?.();
+          } catch (error) {
+            if (import.meta.env.DEV) {
+              console.warn(`[${options.selector}] Template cleanup failed.`, error);
+            }
+          }
         }
       }
 
@@ -77,12 +113,23 @@ export function Component(options: ComponentOptions) {
             return result.value;
           }
           return result;
-        } catch {
+        } catch (error) {
+          if (import.meta.env.DEV && !this._loggedExpressionErrors.has(expr)) {
+            this._loggedExpressionErrors.add(expr);
+            console.warn(
+              `[${options.selector}] Failed to evaluate template expression "${expr}".`,
+              error
+            );
+          }
           return '';
         }
       }
 
-      private _bindTemplate(root: ShadowRoot | HTMLElement, localScope: any = {}) {
+      private _bindTemplate(
+        root: ShadowRoot | HTMLElement,
+        localScope: any = {},
+        cleanupBucket: CleanupBucket = this._cleanupEffects
+      ) {
         if (!root) return;
         
         // 1. Event Listeners
@@ -94,9 +141,11 @@ export function Component(options: ComponentOptions) {
               const methodName = attr.value;
               
               if (typeof (this as any)[methodName] === 'function') {
-                el.addEventListener(eventName, (e) => {
+                const listener = (e: Event) => {
                   (this as any)[methodName](e);
-                });
+                };
+                el.addEventListener(eventName, listener);
+                cleanupBucket.push(() => el.removeEventListener(eventName, listener));
               }
               el.removeAttribute(attr.name);
             }
@@ -113,7 +162,11 @@ export function Component(options: ComponentOptions) {
 
           const listSignal = (this as any)[listName];
           if (listSignal) {
+            let renderCleanups: CleanupBucket = [];
             const cleanup = effect(() => {
+              this._runCleanups(renderCleanups);
+              renderCleanups = [];
+
               Array.from(loopEl.childNodes).forEach(node => {
                 if (node !== template) loopEl.removeChild(node);
               });
@@ -125,12 +178,15 @@ export function Component(options: ComponentOptions) {
                   const container = document.createElement('div');
                   container.style.display = 'contents';
                   container.appendChild(clone);
-                  this._bindTemplate(container, { ...localScope, [itemVar]: item });
+                  this._bindTemplate(container, { ...localScope, [itemVar]: item }, renderCleanups);
                   loopEl.appendChild(container);
                 });
               }
             });
-            this._cleanupEffects.push(cleanup);
+            cleanupBucket.push(() => {
+              cleanup();
+              this._runCleanups(renderCleanups);
+            });
           }
         });
 
@@ -141,7 +197,11 @@ export function Component(options: ComponentOptions) {
           const ifTemplate = ifEl.querySelector('template[data-type="if"]') as HTMLTemplateElement;
           const elseTemplate = ifEl.querySelector('template[data-type="else"]') as HTMLTemplateElement;
 
+          let renderCleanups: CleanupBucket = [];
           const cleanup = effect(() => {
+            this._runCleanups(renderCleanups);
+            renderCleanups = [];
+
             // Clear existing content
             Array.from(ifEl.childNodes).forEach(node => {
               if (node !== ifTemplate && node !== elseTemplate) ifEl.removeChild(node);
@@ -155,11 +215,14 @@ export function Component(options: ComponentOptions) {
               const container = document.createElement('div');
               container.style.display = 'contents';
               container.appendChild(clone);
-              this._bindTemplate(container, localScope);
+              this._bindTemplate(container, localScope, renderCleanups);
               ifEl.appendChild(container);
             }
           });
-          this._cleanupEffects.push(cleanup);
+          cleanupBucket.push(() => {
+            cleanup();
+            this._runCleanups(renderCleanups);
+          });
         });
 
         // 4. Attribute interpolation
@@ -174,7 +237,7 @@ export function Component(options: ComponentOptions) {
                 });
                 el.setAttribute(attr.name, newValue);
               });
-              this._cleanupEffects.push(cleanup);
+              cleanupBucket.push(cleanup);
             }
           });
         });
@@ -195,7 +258,7 @@ export function Component(options: ComponentOptions) {
               return String(this._evaluateExpression(expr, localScope));
             });
           });
-          this._cleanupEffects.push(cleanup);
+          cleanupBucket.push(cleanup);
         });
       }
     }

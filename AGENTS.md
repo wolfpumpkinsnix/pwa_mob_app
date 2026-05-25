@@ -17,9 +17,10 @@
 - Import component templates and styles into the TypeScript file with Vite `?raw` imports.
 - Follow the existing decorator-based component pattern, such as `@Component`.
 - Treat the template engine as a two-part system:
-  - compile-time template transforms in `vite.config.ts`
+  - compile-time template transforms in `build/web-component-template.ts`
   - runtime directive binding and interpolation in `src/lib/component.ts`
 - When changing template syntax or adding directives, keep the compile-time transform output and the runtime DOM handling in sync.
+- Runtime binding changes must preserve cleanup behavior and avoid duplicate listeners or effects across reconnects, loops, and conditionals.
 - UnoCSS is part of the styling pipeline and is configured for Shadow DOM usage.
 - Utility classes may be used in component templates when they fit the existing approach.
 
