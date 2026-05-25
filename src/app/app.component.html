@@ -1,19 +1,75 @@
 <title-bar></title-bar>
-<section id="center" class="relative min-h-screen">
-  <theme-picker class="absolute top-4 right-4"></theme-picker>
-  <div class="hero">
-    <h1 class="text-red-500">Web Component Library</h1>
-    <p>Using standard decorators, Vite ?raw imports, and Signals!</p>
-  </div>
-  <div>
-    <p>Edit <code>src/components/app.component.ts</code> and save to test <code>HMR</code></p>
-  </div>
-  
-  <!-- Notice the Angular-like syntax -->
-  <button id="counter" type="button" class="counter" (click)="increment">
-    Count is {{ count }}
-  </button>
+<div class="app-shell">
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Mobile PWA</p>
+      <h1>My PWA App</h1>
+    </div>
+    <theme-picker></theme-picker>
+  </header>
 
-  <todo-list></todo-list>
-  <pwa-diagnostics></pwa-diagnostics>
-</section>
+  <main class="app-main">
+    @if (activeView.value === 'home') {
+      <section class="home-view">
+        <div class="hero-panel">
+          <p class="eyebrow">Ready to install</p>
+          <h2>Lightweight Web Components for mobile</h2>
+          <p>
+            A small PWA shell with install diagnostics, examples, and no heavy runtime framework.
+          </p>
+        </div>
+
+        <div class="status-grid">
+          <article>
+            <span>01</span>
+            <h3>Installable</h3>
+            <p>Manifest and service worker are configured for Android Chrome.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Offline ready</h3>
+            <p>Workbox precaches the built app and keeps stale caches tidy.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Small core</h3>
+            <p>Native custom elements, Shadow DOM, and fine-grained signals.</p>
+          </article>
+        </div>
+      </section>
+    } @else {
+      @if (activeView.value === 'examples') {
+        <examples-view></examples-view>
+      } @else {
+        <pwa-diagnostics></pwa-diagnostics>
+      }
+    }
+  </main>
+
+  <nav class="bottom-nav" aria-label="Primary">
+    <button
+      type="button"
+      class="{{ isView('home') ? 'active' : '' }}"
+      data-view="home"
+      (click)="setView"
+    >
+      <span>Home</span>
+    </button>
+    <button
+      type="button"
+      class="{{ isView('examples') ? 'active' : '' }}"
+      data-view="examples"
+      (click)="setView"
+    >
+      <span>Examples</span>
+    </button>
+    <button
+      type="button"
+      class="{{ isView('diagnostics') ? 'active' : '' }}"
+      data-view="diagnostics"
+      (click)="setView"
+    >
+      <span>Diagnostics</span>
+    </button>
+  </nav>
+</div>

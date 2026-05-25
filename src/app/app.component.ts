@@ -1,5 +1,5 @@
 import { Component } from "../lib/component";
-import { signal } from "@preact/signals-core";
+import { activeView, type AppView } from "./app.state";
 import template from "./app.component.html?raw";
 import styles from "./app.component.css?raw";
 
@@ -9,11 +9,14 @@ import styles from "./app.component.css?raw";
   styles,
 })
 export class AppComponent extends HTMLElement {
-  // Define a reactive signal
-  count = signal(0);
+  activeView = activeView;
 
-  // The event listener from (click)="increment" in the template will call this
-  increment = () => {
-    this.count.value++;
+  setView = (e: Event) => {
+    const view = (e.currentTarget as HTMLButtonElement).dataset.view as AppView | undefined;
+    if (view) {
+      this.activeView.value = view;
+    }
   };
+
+  isView = (view: AppView) => this.activeView.value === view;
 }

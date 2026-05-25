@@ -1,0 +1,61 @@
+:host {
+  display: block;
+}
+
+.examples-view {
+  display: grid;
+  gap: 16px;
+}
+
+.examples-header {
+  display: grid;
+  gap: 6px;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h2,
+h3 {
+  color: var(--text-h);
+}
+
+.example-panel {
+  background: var(--social-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.counter {
+  align-items: center;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  color: var(--accent);
+  cursor: pointer;
+  display: inline-flex;
+  font: 600 0.95rem/1 var(--mono);
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 14px;
+}
+
+.counter:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

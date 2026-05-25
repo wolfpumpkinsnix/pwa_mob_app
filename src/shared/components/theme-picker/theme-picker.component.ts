@@ -1,4 +1,4 @@
-import { Component } from '../../lib/component';
+import { Component } from '../../../lib/component';
 import { signal, effect } from '@preact/signals-core';
 import template from './theme-picker.component.html?raw';
 

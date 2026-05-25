@@ -1,4 +1,4 @@
-import { Component } from '../../lib/component';
+import { Component } from '../../../lib/component';
 import { signal } from '@preact/signals-core';
 import template from './todo-list.component.html?raw';
 import styles from './todo-list.component.css?raw';

@@ -1,4 +1,4 @@
-import { Component } from '../../lib/component';
+import { Component } from '../../../lib/component';
 import template from './title-bar.component.html?raw';
 import styles from './title-bar.component.css?raw';
 

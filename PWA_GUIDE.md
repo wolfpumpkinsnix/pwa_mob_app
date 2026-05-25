@@ -88,6 +88,8 @@ registerSW({
 });
 ```
 
+In this project, PWA setup lives in `src/core/pwa.ts`. The app entrypoint imports `setupPwa()` from there so manifest fallback logic and service worker registration stay together.
+
 ## 5. Use the correct base path
 
 If the app is deployed under a subfolder, every PWA URL must use that same subfolder.
@@ -128,4 +130,3 @@ The `beforeinstallprompt` event is useful for showing a custom install button, b
 ## Why this project was not installable
 
 This project already had most of the PWA pieces, but the installability flow was fragile because the app is deployed under the GitHub Pages subpath `/pwa_mob_app/`. The manifest, service worker, app base URL, and generated asset URLs must all point to the same scope. A hardcoded manifest link and an incorrect or missing production base path can make Android Chrome read the wrong manifest URL, use the wrong `start_url`, or register the service worker under the wrong scope. Android also requires a secure context, so testing from a phone through a plain local network HTTP address will fail even if the same app works from the HTTPS GitHub Pages URL.
-

@@ -8,8 +8,11 @@
 
 ## Architecture Rules
 
-- Keep components under `src/components/`.
-- When adding a component, create a dedicated folder named after the component.
+- Keep app root components and app-level view state under `src/app/`.
+- Keep platform helpers, such as PWA setup, under `src/core/`.
+- Keep reusable UI components under `src/shared/components/`.
+- Keep feature-owned components under `src/features/<feature>/`.
+- When adding a component, create a dedicated folder named after the component or view.
 - Keep each component's `.ts`, `.html`, and `.css` files separate.
 - Import component templates and styles into the TypeScript file with Vite `?raw` imports.
 - Follow the existing decorator-based component pattern, such as `@Component`.
@@ -31,8 +34,9 @@
 ## PWA Rules
 
 - `vite-plugin-pwa` owns manifest generation and service worker generation.
-- `src/main.ts` owns service worker registration through `virtual:pwa-register`.
-- Do not add duplicate hardcoded manifest links in `index.html`; keep the existing runtime fallback in `src/main.ts`.
+- `src/core/pwa.ts` owns service worker registration through `virtual:pwa-register` and the runtime manifest-link fallback.
+- `src/main.ts` should import and call `setupPwa()`.
+- Do not add duplicate hardcoded manifest links in `index.html`; keep the existing runtime fallback in `src/core/pwa.ts`.
 - Prefer the existing `vite-plugin-pwa` and Workbox configuration over adding another PWA dependency.
 - Preserve required Android installability fields: `name` or `short_name`, `start_url`, `scope`, `display`, and `192x192` plus `512x512` PNG icons.
 

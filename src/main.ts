@@ -1,38 +1,9 @@
 import './style.css';
-import './components/theme-picker/theme-picker.component';
-import './components/title-bar/title-bar.component';
-import './components/todo-list/todo-list.component';
-import './components/pwa-diagnostics/pwa-diagnostics.component';
+import './shared/components/theme-picker/theme-picker.component';
+import './shared/components/title-bar/title-bar.component';
+import './features/examples/examples-view/examples-view.component';
+import './features/pwa-diagnostics/pwa-diagnostics.component';
 import './app/app.component';
+import { setupPwa } from './core/pwa';
 
-import { registerSW } from 'virtual:pwa-register';
-
-function ensureManifestLink() {
-  const existingLink = document.querySelector('link[rel~="manifest"]');
-  if (existingLink) return;
-
-  const manifestLink = document.createElement('link');
-  manifestLink.setAttribute('rel', 'manifest');
-  manifestLink.setAttribute('href', `${import.meta.env.BASE_URL}manifest.webmanifest`);
-  document.head.appendChild(manifestLink);
-}
-
-ensureManifestLink();
-
-registerSW({
-  immediate: true,
-  onRegisteredSW(swUrl) {
-    console.log(`Service worker registered: ${swUrl}`);
-  },
-  onRegisterError(error) {
-    console.error('Service worker registration failed.', error);
-  },
-  onNeedRefresh() {
-    if (confirm('New content available. Reload?')) {
-      window.location.reload();
-    }
-  },
-  onOfflineReady() {
-    console.log('App ready to work offline.');
-  },
-});
+setupPwa();
