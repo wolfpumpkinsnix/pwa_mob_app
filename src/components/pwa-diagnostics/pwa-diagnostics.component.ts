@@ -8,6 +8,51 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 };
 
+type ManifestIcon = {
+  sizes?: string;
+};
+
+type WebAppManifest = {
+  name?: string;
+  short_name?: string;
+  icons?: ManifestIcon[];
+  start_url?: string;
+  scope?: string;
+  display?: string;
+  prefer_related_applications?: boolean;
+};
+
+type DiagnosticsState = {
+  isHttps: boolean;
+  isLocalhost: boolean;
+  isSecureContext: boolean;
+  hasServiceWorkerSupport: boolean;
+  swActive: boolean;
+  swScope: string;
+  manifestFound: boolean;
+  manifestReachable: boolean;
+  manifestHasRequiredFields: boolean;
+  manifestAttrHref: string;
+  manifestHref: string;
+  manifestStartUrl: string;
+  manifestScope: string;
+  manifestDisplay: string;
+  manifestIconSizes: string;
+  baseUri: string;
+  headLinks: string;
+  installPromptFired: boolean;
+  url: string;
+  issue: string;
+  nextStep: string;
+};
+
+const installableDisplays = new Set([
+  'fullscreen',
+  'standalone',
+  'minimal-ui',
+  'window-controls-overlay',
+]);
+
 @Component({
   selector: 'pwa-diagnostics',
   template,
@@ -18,14 +63,22 @@ export class PwaDiagnosticsComponent extends HTMLElement {
   deferredPrompt: InstallPromptEvent | null = null;
   private _manifestObserver?: MutationObserver;
 
-  diagnostics = signal({
+  diagnostics = signal<DiagnosticsState>({
     isHttps: window.location.protocol === 'https:',
     isLocalhost: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+    isSecureContext: window.isSecureContext,
+    hasServiceWorkerSupport: 'serviceWorker' in navigator,
     swActive: false,
+    swScope: '',
     manifestFound: false,
     manifestReachable: false,
+    manifestHasRequiredFields: false,
     manifestAttrHref: '',
     manifestHref: '',
+    manifestStartUrl: '',
+    manifestScope: '',
+    manifestDisplay: '',
+    manifestIconSizes: '',
     baseUri: document.baseURI,
     headLinks: '',
     installPromptFired: false,
@@ -55,14 +108,19 @@ export class PwaDiagnosticsComponent extends HTMLElement {
     });
 
     if ('serviceWorker' in navigator) {
+      void this.checkServiceWorker();
       navigator.serviceWorker.ready.then((reg) => {
-        this.updateDiagnostics({ swActive: !!reg.active });
+        this.updateDiagnostics({
+          swActive: !!reg.active,
+          swScope: reg.scope,
+        });
       });
     }
   }
 
   connectedCallback() {
     void this.checkManifest();
+    void this.checkServiceWorker();
 
     this._manifestObserver = new MutationObserver(() => {
       void this.checkManifest();
@@ -89,23 +147,7 @@ export class PwaDiagnosticsComponent extends HTMLElement {
     this._manifestObserver?.disconnect();
   }
 
-  private updateDiagnostics(
-    updates: Partial<{
-      isHttps: boolean;
-      isLocalhost: boolean;
-      swActive: boolean;
-      manifestFound: boolean;
-      manifestReachable: boolean;
-      manifestAttrHref: string;
-      manifestHref: string;
-      baseUri: string;
-      headLinks: string;
-      installPromptFired: boolean;
-      url: string;
-      issue: string;
-      nextStep: string;
-    }>
-  ) {
+  private updateDiagnostics(updates: Partial<DiagnosticsState>) {
     const headLinks = Array.from(document.head.querySelectorAll('link'))
       .map((node, index) => {
         const rel = node.getAttribute('rel') ?? '(no rel)';
@@ -122,25 +164,30 @@ export class PwaDiagnosticsComponent extends HTMLElement {
       headLinks,
     };
 
-    const secureOrigin = next.isHttps || next.isLocalhost;
     let issue: string;
     let nextStep: string;
 
-    if (!secureOrigin) {
+    if (!next.isSecureContext) {
       issue = 'Android Chrome blocks PWA install on non-HTTPS remote origins.';
-      nextStep = 'Open the app over HTTPS, or test locally with localhost.';
+      nextStep = 'Open the app over HTTPS. A phone visiting a local LAN IP over HTTP is not a secure context.';
+    } else if (!next.hasServiceWorkerSupport) {
+      issue = 'This browser does not expose service worker support.';
+      nextStep = 'Test in Chrome or another Android browser with PWA support.';
     } else if (!next.manifestFound) {
       issue = 'No manifest link was detected in the document head.';
-      nextStep = 'Check that Vite PWA injected a <link rel="manifest"> tag into the page.';
+      nextStep = 'Check that vite-plugin-pwa injected a manifest link into the built page.';
     } else if (!next.manifestReachable) {
       issue = 'The manifest link exists, but the URL does not resolve from this page.';
       nextStep = 'Compare the current URL and manifest URL below. A wrong BASE_PATH is the most likely cause.';
+    } else if (!next.manifestHasRequiredFields) {
+      issue = 'The manifest is reachable, but it is missing an Android installability field.';
+      nextStep = 'Confirm name, start_url, display, prefer_related_applications, and 192x192 plus 512x512 icons below.';
     } else if (!next.swActive) {
       issue = 'The manifest is present, but the service worker is not active yet.';
       nextStep = 'Reload once after the first visit and wait for the service worker to finish registering.';
     } else if (!next.installPromptFired) {
       issue = 'Installability checks have not produced a prompt yet.';
-      nextStep = 'On Android, browse a little and wait; Chrome may defer the prompt even when the app is installable.';
+      nextStep = 'Tap the page and keep it open for at least 30 seconds; Chrome may defer beforeinstallprompt even when the menu install works.';
     } else {
       issue = 'Install prerequisites look good.';
       nextStep = 'Use the Install App button or Chrome’s Add to Home screen action.';
@@ -172,24 +219,85 @@ export class PwaDiagnosticsComponent extends HTMLElement {
     }
 
     let manifestReachable: boolean;
+    let manifest: WebAppManifest | null = null;
     try {
       const response = await fetch(manifestHref, {
         method: 'GET',
         cache: 'no-store',
       });
       manifestReachable = response.ok;
+      if (response.ok) {
+        manifest = await response.json() as WebAppManifest;
+      }
     } catch {
       manifestReachable = false;
     }
 
+    const manifestDetails = this.getManifestDetails(manifest);
+
     this.updateDiagnostics({
       manifestFound: true,
       manifestReachable,
+      manifestHasRequiredFields: manifestDetails.hasRequiredFields,
       manifestAttrHref,
       manifestHref,
+      manifestStartUrl: manifestDetails.startUrl,
+      manifestScope: manifestDetails.scope,
+      manifestDisplay: manifestDetails.display,
+      manifestIconSizes: manifestDetails.iconSizes,
     });
 
     return manifestReachable;
+  }
+
+  private async checkServiceWorker() {
+    if (!('serviceWorker' in navigator)) {
+      this.updateDiagnostics({
+        hasServiceWorkerSupport: false,
+        swActive: false,
+        swScope: '',
+      });
+      return;
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.getRegistration();
+      this.updateDiagnostics({
+        hasServiceWorkerSupport: true,
+        swActive: !!registration?.active || !!navigator.serviceWorker.controller,
+        swScope: registration?.scope ?? '',
+      });
+    } catch {
+      this.updateDiagnostics({
+        hasServiceWorkerSupport: true,
+        swActive: false,
+        swScope: '',
+      });
+    }
+  }
+
+  private getManifestDetails(manifest: WebAppManifest | null) {
+    const iconSizes = (manifest?.icons ?? [])
+      .flatMap((icon) => icon.sizes?.split(/\s+/).filter(Boolean) ?? []);
+
+    const display = manifest?.display ?? '';
+    const hasRequiredFields = !!(
+      manifest &&
+      (manifest.name || manifest.short_name) &&
+      manifest.start_url &&
+      installableDisplays.has(display) &&
+      manifest.prefer_related_applications !== true &&
+      iconSizes.includes('192x192') &&
+      iconSizes.includes('512x512')
+    );
+
+    return {
+      hasRequiredFields,
+      startUrl: manifest?.start_url ?? '',
+      scope: manifest?.scope ?? '',
+      display,
+      iconSizes: iconSizes.join(', '),
+    };
   }
 
   installPwa = async () => {

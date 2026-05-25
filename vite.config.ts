@@ -8,9 +8,18 @@ function normalizeBasePath(basePath: string) {
   if (!basePath || basePath === "/") return "/";
 
   let normalized = basePath.trim();
+  if (!normalized) return "/";
   if (!normalized.startsWith("/")) normalized = `/${normalized}`;
   if (!normalized.endsWith("/")) normalized = `${normalized}/`;
   return normalized;
+}
+
+function getProductionBasePath() {
+  if (process.env.BASE_PATH) return process.env.BASE_PATH;
+  if (process.env.VITE_BASE_PATH) return process.env.VITE_BASE_PATH;
+
+  const repositoryName = process.env.GITHUB_REPOSITORY?.split("/")[1];
+  return repositoryName ? `/${repositoryName}/` : "/";
 }
 
 function webComponentTemplate() {
@@ -98,7 +107,7 @@ function webComponentTemplate() {
 export default defineConfig(({ command }) => {
   const base = command === "serve"
     ? "/"
-    : normalizeBasePath(process.env.BASE_PATH ?? "/");
+    : normalizeBasePath(getProductionBasePath());
 
   return {
     base,
@@ -109,6 +118,7 @@ export default defineConfig(({ command }) => {
       }),
       VitePWA({
         registerType: "autoUpdate",
+        manifestFilename: "manifest.webmanifest",
         includeAssets: [
           "favicon.svg",
           "pwa-192x192.png",
@@ -123,7 +133,7 @@ export default defineConfig(({ command }) => {
           short_name: "PWA WebComp",
           description:
             "A dependency-light Progressive Web App built with Web Components",
-          display_override: ["window-controls-overlay"],
+          display_override: ["window-controls-overlay", "standalone"],
           theme_color: "#1a1a1a",
           background_color: "#ffffff",
           display: "standalone",

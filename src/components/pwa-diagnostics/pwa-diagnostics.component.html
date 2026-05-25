@@ -4,8 +4,8 @@
 
 <div class="diagnostic-card">
   <h3>PWA Status</h3>
-  <div class="stat {{ diagnostics.value.isHttps || diagnostics.value.isLocalhost ? 'pass' : 'fail' }}">
-    Secure Origin: {{ diagnostics.value.isHttps || diagnostics.value.isLocalhost ? 'YES' : 'NO (HTTPS required)' }}
+  <div class="stat {{ diagnostics.value.isSecureContext ? 'pass' : 'fail' }}">
+    Secure Context: {{ diagnostics.value.isSecureContext ? 'YES' : 'NO (HTTPS required)' }}
   </div>
   <div class="stat {{ diagnostics.value.swActive ? 'pass' : 'fail' }}">
     Service Worker: {{ diagnostics.value.swActive ? 'ACTIVE' : 'NOT FOUND' }}
@@ -15,6 +15,9 @@
   </div>
   <div class="stat {{ diagnostics.value.manifestReachable ? 'pass' : 'fail' }}">
     Manifest URL: {{ diagnostics.value.manifestReachable ? 'REACHABLE' : 'NOT REACHABLE' }}
+  </div>
+  <div class="stat {{ diagnostics.value.manifestHasRequiredFields ? 'pass' : 'fail' }}">
+    Manifest Fields: {{ diagnostics.value.manifestHasRequiredFields ? 'INSTALLABLE' : 'INCOMPLETE' }}
   </div>
   <div class="stat {{ diagnostics.value.installPromptFired ? 'pass' : 'fail' }}">
     Install Prompt: {{ diagnostics.value.installPromptFired ? 'READY' : 'WAITING...' }}
@@ -32,6 +35,21 @@
   </div>
   <div class="stat info">
     Manifest Href: {{ diagnostics.value.manifestHref || 'not detected' }}
+  </div>
+  <div class="stat info">
+    Manifest Start URL: {{ diagnostics.value.manifestStartUrl || 'not detected' }}
+  </div>
+  <div class="stat info">
+    Manifest Scope: {{ diagnostics.value.manifestScope || 'not detected' }}
+  </div>
+  <div class="stat info">
+    Manifest Display: {{ diagnostics.value.manifestDisplay || 'not detected' }}
+  </div>
+  <div class="stat info">
+    Manifest Icon Sizes: {{ diagnostics.value.manifestIconSizes || 'not detected' }}
+  </div>
+  <div class="stat info">
+    Service Worker Scope: {{ diagnostics.value.swScope || 'not detected' }}
   </div>
   <div class="stat info">
     Base URI: {{ diagnostics.value.baseUri }}
