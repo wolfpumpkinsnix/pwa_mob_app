@@ -1,7 +1,63 @@
-<select 
-  class="bg-bg text-text border border-border rounded px-3 py-1 text-sm cursor-pointer outline-none focus:border-primary"
-  (change)="onChange"
->
-  <option value="light">Light</option>
-  <option value="dark">Dark</option>
-</select>
+<div class="theme-picker">
+  <button
+    type="button"
+    class="trigger"
+    aria-label="Theme"
+    aria-haspopup="menu"
+    aria-expanded="{{ isOpen.value ? 'true' : 'false' }}"
+    (click)="toggleMenu"
+  >
+    <span class="swatch" style="background: {{ selectedTheme.value.color }}"></span>
+    <span>{{ selectedTheme.value.label }}</span>
+  </button>
+
+  @if (isOpen.value) {
+    <div class="menu" role="menu">
+      <button
+        type="button"
+        class="option {{ isSelected(systemTheme.value) ? 'selected' : '' }}"
+        data-theme="{{ systemTheme.value }}"
+        role="menuitemradio"
+        aria-checked="{{ isSelected(systemTheme.value) ? 'true' : 'false' }}"
+        (click)="selectTheme"
+      >
+        <span class="swatch" style="background: {{ systemTheme.color }}"></span>
+        <span class="label">{{ systemTheme.label }}</span>
+      </button>
+
+      <div class="divider" role="separator">
+        <span>Light</span>
+      </div>
+      @for (theme of lightThemes) {
+        <button
+          type="button"
+          class="option {{ isSelected(theme.value) ? 'selected' : '' }}"
+          data-theme="{{ theme.value }}"
+          role="menuitemradio"
+          aria-checked="{{ isSelected(theme.value) ? 'true' : 'false' }}"
+          (click)="selectTheme"
+        >
+          <span class="swatch" style="background: {{ theme.color }}"></span>
+          <span class="label">{{ theme.label }}</span>
+        </button>
+      }
+
+      <div class="divider" role="separator">
+        <span>Dark</span>
+      </div>
+      @for (theme of darkThemes) {
+        <button
+          type="button"
+          class="option {{ isSelected(theme.value) ? 'selected' : '' }}"
+          data-theme="{{ theme.value }}"
+          role="menuitemradio"
+          aria-checked="{{ isSelected(theme.value) ? 'true' : 'false' }}"
+          (click)="selectTheme"
+        >
+          <span class="swatch" style="background: {{ theme.color }}"></span>
+          <span class="label">{{ theme.label }}</span>
+        </button>
+      }
+    </div>
+  }
+</div>

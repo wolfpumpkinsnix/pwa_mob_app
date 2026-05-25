@@ -6,6 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>pwa_app</title>
     <meta name="theme-color" content="#1a1a1a" />
+    <script>
+      (() => {
+        try {
+          const stored = localStorage.getItem('theme');
+          const systemDark = matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = stored === 'dark' || stored === 'light' || stored === 'green'
+            ? stored
+            : systemDark
+              ? 'dark'
+              : 'light';
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
+          document.querySelector('meta[name="theme-color"]')?.setAttribute(
+            'content',
+            theme === 'dark' ? '#16171d' : theme === 'green' ? '#f2fbf5' : '#ffffff'
+          );
+        } catch {
+          document.documentElement.dataset.theme = 'light';
+          document.documentElement.style.colorScheme = 'light';
+        }
+      })();
+    </script>
     <link rel="apple-touch-icon" href="pwa-192x192.png" />
   </head>
   <body>

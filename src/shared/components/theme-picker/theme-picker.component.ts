@@ -1,47 +1,99 @@
 import { Component } from '../../../lib/component';
-import { signal, effect } from '@preact/signals-core';
+import { effect, signal } from '@preact/signals-core';
+import {
+  setThemePreference,
+  THEME_PALETTES,
+  themePreference,
+  type ThemePreference,
+} from '../../../core/theme';
 import template from './theme-picker.component.html?raw';
+import styles from './theme-picker.component.css?raw';
+
+type ThemeOption = {
+  value: ThemePreference;
+  label: string;
+  mode: 'System' | 'Light' | 'Dark';
+  color: string;
+};
+
+const THEME_OPTIONS: ThemeOption[] = [
+  {
+    value: 'system',
+    label: 'System',
+    mode: 'System',
+    color: 'linear-gradient(135deg, #ffffff 0 50%, #16171d 50% 100%)',
+  },
+  {
+    value: 'light',
+    label: 'Light',
+    mode: 'Light',
+    color: THEME_PALETTES.light.primary,
+  },
+  {
+    value: 'green',
+    label: 'Green',
+    mode: 'Light',
+    color: THEME_PALETTES.green.primary,
+  },
+  {
+    value: 'dark',
+    label: 'Dark',
+    mode: 'Dark',
+    color: THEME_PALETTES.dark.primary,
+  },
+];
 
 @Component({
   selector: 'theme-picker',
   template,
+  styles,
 })
 export class ThemePickerComponent extends HTMLElement {
-  theme = signal('light');
-  
-  // We compute these for template bindings to set 'selected' attribute
-  lightSelected = '';
-  darkSelected = '';
-
-  constructor() {
-    super();
-    // Load theme from localStorage or default to light
-    const storedTheme = localStorage.getItem('theme') || 'light';
-    this.theme.value = storedTheme;
-  }
+  private disposeThemeSync?: () => void;
+  private removeDocumentListener?: () => void;
+  isOpen = signal(false);
+  selectedTheme = signal<ThemeOption>(THEME_OPTIONS[0]);
+  lightThemes = THEME_OPTIONS.filter(option => option.mode === 'Light');
+  darkThemes = THEME_OPTIONS.filter(option => option.mode === 'Dark');
+  systemTheme = THEME_OPTIONS.find(option => option.value === 'system')!;
 
   connectedCallback() {
-    // Watch theme changes
-    effect(() => {
-      const currentTheme = this.theme.value;
-      
-      // Update data attribute on root HTML element
-      document.documentElement.setAttribute('data-theme', currentTheme);
-      localStorage.setItem('theme', currentTheme);
-
-      // Update computed properties for the template
-      // Note: Because our simple template system replaces {{var}} with the value ONCE at render,
-      // dynamically updating attributes like 'selected' across options is a bit tricky.
-      // Instead, we can just sync the <select> element's value directly.
-      const selectEl = this.shadowRoot?.querySelector('select');
-      if (selectEl) {
-        selectEl.value = currentTheme;
-      }
+    this.disposeThemeSync?.();
+    this.disposeThemeSync = effect(() => {
+      this.selectedTheme.value = this.getThemeOption(themePreference.value);
     });
+
+    const onDocumentPointerDown = (event: PointerEvent) => {
+      if (!this.contains(event.target as Node) && !event.composedPath().includes(this)) {
+        this.isOpen.value = false;
+      }
+    };
+    document.addEventListener('pointerdown', onDocumentPointerDown);
+    this.removeDocumentListener = () => {
+      document.removeEventListener('pointerdown', onDocumentPointerDown);
+    };
   }
 
-  onChange = (e: Event) => {
-    const select = e.target as HTMLSelectElement;
-    this.theme.value = select.value;
+  disconnectedCallback() {
+    this.disposeThemeSync?.();
+    this.disposeThemeSync = undefined;
+    this.removeDocumentListener?.();
+    this.removeDocumentListener = undefined;
+  }
+
+  toggleMenu = () => {
+    this.isOpen.value = !this.isOpen.value;
   };
+
+  selectTheme = (e: Event) => {
+    const button = e.currentTarget as HTMLButtonElement;
+    setThemePreference(button.dataset.theme ?? 'system');
+    this.isOpen.value = false;
+  };
+
+  isSelected = (theme: ThemePreference) => this.selectedTheme.value.value === theme;
+
+  private getThemeOption(theme: ThemePreference) {
+    return THEME_OPTIONS.find(option => option.value === theme) ?? THEME_OPTIONS[0];
+  }
 }

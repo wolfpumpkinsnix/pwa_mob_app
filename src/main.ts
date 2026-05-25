@@ -5,5 +5,7 @@ import './features/examples/examples-view/examples-view.component';
 import './features/pwa-diagnostics/pwa-diagnostics.component';
 import './app/app.component';
 import { setupPwa } from './core/pwa';
+import { setupTheme } from './core/theme';
 
+setupTheme();
 setupPwa();

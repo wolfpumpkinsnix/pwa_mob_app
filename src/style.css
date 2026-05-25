@@ -1,12 +1,21 @@
 :root {
-  --text: #6b6375;
+  --base: #ffffff;
+  --primary: #aa3bff;
+  --secondary: #0ea5e9;
+  --accent: #aa3bff;
+  --neutral: #6b6375;
+  --info: #0284c7;
+  --success: #16a34a;
+  --warning: #d97706;
+  --error: #dc2626;
+
+  --text: var(--neutral);
   --text-h: #08060d;
-  --bg: #fff;
+  --bg: var(--base);
   --border: #e5e4e7;
   --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
+  --accent-bg: color-mix(in srgb, var(--primary) 10%, transparent);
+  --accent-border: color-mix(in srgb, var(--primary) 50%, transparent);
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
@@ -17,13 +26,13 @@
 
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: light dark;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color-scheme: light;
 
   @media (max-width: 1024px) {
     font-size: 16px;
@@ -31,17 +40,51 @@
 }
 
 :root[data-theme="dark"] {
-  --text: #9ca3af;
+  --base: #16171d;
+  --primary: #c084fc;
+  --secondary: #38bdf8;
+  --accent: #c084fc;
+  --neutral: #9ca3af;
+  --info: #60a5fa;
+  --success: #4ade80;
+  --warning: #facc15;
+  --error: #f87171;
+
+  --text: var(--neutral);
   --text-h: #f3f4f6;
-  --bg: #16171d;
+  --bg: var(--base);
   --border: #2e303a;
   --code-bg: #1f2028;
-  --accent: #c084fc;
-  --accent-bg: rgba(192, 132, 252, 0.15);
-  --accent-border: rgba(192, 132, 252, 0.5);
+  --accent-bg: color-mix(in srgb, var(--primary) 15%, transparent);
+  --accent-border: color-mix(in srgb, var(--primary) 50%, transparent);
   --social-bg: rgba(47, 48, 58, 0.5);
   --shadow:
     rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  color-scheme: dark;
+}
+
+:root[data-theme="green"] {
+  --base: #f2fbf5;
+  --primary: #137a4b;
+  --secondary: #0f766e;
+  --accent: #137a4b;
+  --neutral: #4b6355;
+  --info: #0891b2;
+  --success: #15803d;
+  --warning: #ca8a04;
+  --error: #dc2626;
+
+  --text: var(--neutral);
+  --text-h: #10261a;
+  --bg: var(--base);
+  --border: #cfe3d5;
+  --code-bg: #e3f2e8;
+  --accent-bg: color-mix(in srgb, var(--primary) 12%, transparent);
+  --accent-border: color-mix(in srgb, var(--primary) 45%, transparent);
+  --social-bg: rgba(224, 242, 232, 0.65);
+  --shadow:
+    rgba(16, 38, 26, 0.12) 0 10px 15px -3px, rgba(16, 38, 26, 0.08) 0 4px 6px -2px;
+  color-scheme: light;
 }
 
 :root[data-theme="dark"] #social .button-icon {
